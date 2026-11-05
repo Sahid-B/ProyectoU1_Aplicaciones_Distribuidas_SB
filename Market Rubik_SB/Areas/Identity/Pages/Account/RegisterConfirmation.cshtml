@@ -1,0 +1,68 @@
+@page
+@model MiniMarketApp.Areas.Identity.Pages.Account.RegisterConfirmationModel
+@{
+    ViewData["Title"] = "Confirmar Cuenta - Supermarket Rubik";
+}
+
+<div class="row justify-content-center my-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg border-0 rounded-4 overflow-hidden auth-card">
+            <div class="card-header text-white text-center py-4 px-4" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
+                <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle shadow-sm p-3 mb-2" style="width: 60px; height: 60px;">
+                    <i class="bi bi-envelope-check-fill text-primary fs-2"></i>
+                </div>
+                <h4 class="fw-bold mb-1">Verificar Correo Electrónico</h4>
+                <p class="mb-0 text-white-50 small">Ingresa el código enviado a tu email</p>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <p class="text-muted small">
+                        Hemos enviado un código de verificación de 6 dígitos a:<br />
+                        <strong class="text-dark fs-6">@Model.Email</strong>
+                    </p>
+                </div>
+
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success border-0 rounded-3 text-center mb-4 small py-2">
+                        <i class="bi bi-check-circle-fill me-1"></i> @TempData["SuccessMessage"]
+                    </div>
+                }
+
+                <form method="post" asp-route-userId="@Model.UserId" asp-route-email="@Model.Email" asp-route-code="@Model.Code">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 rounded-3 small mb-3" role="alert"></div>
+
+                    <div class="mb-4">
+                        <label asp-for="Input.Code" class="form-label fw-semibold text-secondary small">Código de Verificación (6 dígitos)</label>
+                        <div class="input-group input-group-lg shadow-sm rounded-3 overflow-hidden">
+                            <span class="input-group-text bg-light border-end-0 text-muted px-3"><i class="bi bi-shield-lock-fill text-primary"></i></span>
+                            <input asp-for="Input.Code" class="form-control border-start-0 font-monospace text-center fw-bold fs-3 letter-spacing-2" placeholder="000000" maxlength="6" autofocus autocomplete="off" />
+                        </div>
+                        <span asp-validation-for="Input.Code" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary bg-gradient w-100 rounded-3 py-3 fw-bold mb-3 shadow-sm border-0 d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-check-circle-fill"></i> Confirmar y Acceder
+                    </button>
+                </form>
+
+                <form method="post" asp-page-handler="Resend" asp-route-userId="@Model.UserId" asp-route-email="@Model.Email">
+                    <div class="text-center mt-3">
+                        <p class="text-muted small mb-1">¿No recibiste el código?</p>
+                        <button type="submit" class="btn btn-link btn-sm text-primary text-decoration-none fw-semibold">
+                            <i class="bi bi-arrow-clockwise"></i> Reenviar código de verificación
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-4">
+                    <a asp-page="./Register" class="text-muted small text-decoration-none"><i class="bi bi-arrow-left me-1"></i> Volver a registro</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

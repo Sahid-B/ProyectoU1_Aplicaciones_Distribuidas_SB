@@ -1,0 +1,97 @@
+@page
+@model Microsoft.AspNetCore.Identity.UI.V5.Pages.Account.Internal.LoginWith2faModel
+@{
+    ViewData["Title"] = "Autenticación de Dos Factores - Supermarket Rubik";
+}
+
+<div class="row justify-content-center my-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg border-0 rounded-4 overflow-hidden auth-card">
+            <div class="card-header text-white text-center py-4 px-4 position-relative" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
+                <div class="security-badge-wrapper mb-2">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle shadow-sm p-3" style="width: 64px; height: 64px;">
+                        <i class="bi bi-shield-lock-fill text-primary fs-2"></i>
+                    </div>
+                </div>
+                <h3 class="fw-bold mb-1">Verificación de Seguridad</h3>
+                <p class="mb-0 text-white-50 fs-6">Autenticación de Dos Factores (2FA)</p>
+            </div>
+            
+            <div class="card-body p-4 p-md-5">
+                <div class="alert alert-info border-0 rounded-3 d-flex align-items-start gap-2 mb-4 p-3 shadow-sm" style="background-color: #e7f1ff; color: #084298;">
+                    <i class="bi bi-info-circle-fill fs-5 flex-shrink-0 mt-1"></i>
+                    <small>Tu inicio de sesión está protegido. Ingresa el código de 6 dígitos que muestra tu aplicación autenticadora (Google Authenticator, Authy, Microsoft Authenticator).</small>
+                </div>
+
+                <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
+                    <input asp-for="RememberMe" type="hidden" />
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 border-0 shadow-sm" role="alert"></div>
+
+                    <div class="mb-4">
+                        <label asp-for="Input.TwoFactorCode" class="form-label fw-semibold text-secondary mb-2">
+                            <i class="bi bi-phone-vibrate me-1 text-primary"></i> Código de Autenticador
+                        </label>
+                        <div class="input-group input-group-lg shadow-sm rounded-3 overflow-hidden">
+                            <span class="input-group-text bg-light border-end-0 text-muted px-3">
+                                <i class="bi bi-shield-check text-primary"></i>
+                            </span>
+                            <input asp-for="Input.TwoFactorCode" 
+                                   class="form-control border-start-0 font-monospace fs-2 fw-bold text-center letter-spacing-2" 
+                                   autocomplete="one-time-code" 
+                                   placeholder="000 000" 
+                                   maxlength="7" 
+                                   autofocus 
+                                   id="twoFactorCodeInput" />
+                        </div>
+                        <span asp-validation-for="Input.TwoFactorCode" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="form-check form-switch mb-4 p-2 bg-light rounded-3 d-flex align-items-center justify-content-between pe-3">
+                        <label class="form-check-label text-secondary fw-medium ms-5 cursor-pointer" asp-for="Input.RememberMachine">
+                            <i class="bi bi-laptop me-1 text-primary"></i> Recordar este dispositivo
+                        </label>
+                        <input class="form-check-input ms-0 cursor-pointer" asp-for="Input.RememberMachine" style="width: 2.5em; height: 1.3em;" />
+                    </div>
+
+                    <button type="submit" class="w-100 btn btn-primary bg-gradient btn-lg rounded-3 fw-bold shadow-sm py-3 mb-3 border-0 d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-box-arrow-in-right fs-5"></i> Verificar e Iniciar Sesión
+                    </button>
+                </form>
+
+                <hr class="my-4 text-muted opacity-25" />
+
+                <div class="bg-light rounded-3 p-3 text-center mb-3">
+                    <p class="text-muted small mb-2"><i class="bi bi-question-circle-fill text-warning me-1"></i> ¿No tienes acceso a tu app autenticadora?</p>
+                    <a asp-page="./LoginWithRecoveryCode" asp-route-returnUrl="@Model.ReturnUrl" class="btn btn-sm btn-outline-secondary rounded-pill fw-semibold px-3">
+                        <i class="bi bi-key-fill me-1 text-warning"></i> Ingresar con código de recuperación
+                    </a>
+                </div>
+
+                <div class="text-center">
+                    <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="text-decoration-none small text-muted">
+                        <i class="bi bi-arrow-left me-1"></i> Volver al Inicio de Sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const input = document.getElementById("twoFactorCodeInput");
+            if (input) {
+                input.focus();
+                input.addEventListener("input", function (e) {
+                    let val = e.target.value.replace(/\D/g, "");
+                    if (val.length > 3) {
+                        val = val.substring(0, 3) + " " + val.substring(3, 6);
+                    }
+                    e.target.value = val;
+                });
+            }
+        });
+    </script>
+}

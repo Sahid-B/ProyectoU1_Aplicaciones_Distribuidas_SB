@@ -1,0 +1,110 @@
+@{
+    ViewData["Title"] = "¡Compra Exitosa!";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6 text-center">
+            <div class="card shadow border-0 rounded-4 p-5 text-center bg-white">
+                <div class="mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-success text-white rounded-circle" style="width: 100px; height: 100px;">
+                        <i class="bi bi-check-lg" style="font-size: 4rem;"></i>
+                    </div>
+                </div>
+                <h2 class="fw-bold text-success mb-3">¡Pago Procesado!</h2>
+                <p class="text-muted fs-5 mb-4">
+                    Tu compra se ha realizado con éxito. El estado de tu pedido es <strong>Pendiente</strong> de envío.
+                </p>
+                <div class="bg-light rounded-3 p-3 mb-4 d-inline-block">
+                    <span class="text-secondary me-2">Número de Orden interna:</span>
+                    <strong class="text-dark fs-5">#@ViewBag.VentaId</strong>
+                </div>
+                <div>
+                    <a asp-action="CancelarCompra" asp-route-id="@ViewBag.VentaId" class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-bold mb-2">
+                        <i class="bi bi-shop me-2"></i> Volver a la Tienda
+                    </a>
+                </div>
+                <hr />
+                <h5 class="fw-bold mb-3">Pagar ahora usando:</h5>
+                <div class="d-flex flex-column align-items-center justify-content-center gap-3 w-100">
+                    <!-- Contenedor del Botón Embebido de PayPal -->
+                    <div id="paypal-button-container" class="w-100" style="max-width: 300px; z-index: 1; position: relative;"></div>
+
+                    <a href="@Url.Action("CreateLink", "Payment", new { orderId = ViewBag.VentaId })" class="btn btn-info rounded-pill px-4 py-2 fw-bold shadow-sm text-white w-100" style="max-width: 300px; background-color: #f37021; border-color: #f37021;">
+                        <i class="bi bi-phone"></i> PayPhone
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+@if (!string.IsNullOrEmpty(ViewBag.PayPalClientId as string) && ViewBag.PayPalClientId != "sb")
+{
+    <script src="https://www.paypal.com/sdk/js?client-id=@ViewBag.PayPalClientId&currency=USD" onerror="onPayPalSdkError()"></script>
+    <script>
+        function onPayPalSdkError() {
+            document.getElementById('paypal-button-container').innerHTML =
+                '<p class="text-danger small">No se pudo cargar PayPal. Intenta recargando la página.</p>';
+        }
+
+        if (typeof paypal !== 'undefined') {
+            paypal.Buttons({
+                style: {
+                    layout: 'vertical',
+                    color:  'gold',
+                    shape:  'pill',
+                    label:  'paypal'
+                },
+                createOrder: function(data, actions) {
+                    return fetch('/Payment/CreatePayPalOrderApi?orderId=@ViewBag.VentaId', {
+                        method: 'post'
+                    }).then(function(res) {
+                        return res.json();
+                    }).then(function(orderData) {
+                        if (orderData.error) {
+                            alert("Error: " + orderData.error);
+                            throw new Error(orderData.error);
+                        }
+                        return orderData.id;
+                    });
+                },
+                onApprove: function(data, actions) {
+                    return fetch('/Payment/SuccessApi?token=' + data.orderID, {
+                        method: 'post'
+                    }).then(function(res) {
+                        return res.json();
+                    }).then(function(orderData) {
+                        if (orderData.paymentId) {
+                            window.location.href = '/Payment/Details/' + orderData.paymentId;
+                        } else {
+                            alert("Hubo un error al confirmar el pago.");
+                        }
+                    });
+                },
+                onCancel: function(data) {
+                    window.location.href = '/Payment/Cancel?token=' + data.orderID;
+                },
+                onError: function(err) {
+                    console.error(err);
+                    document.getElementById('paypal-button-container').innerHTML =
+                        '<p class="text-danger small">Error en PayPal. Por favor usa PayPhone.</p>';
+                }
+            }).render('#paypal-button-container');
+        } else {
+            document.addEventListener('DOMContentLoaded', function() {
+                document.getElementById('paypal-button-container').innerHTML =
+                    '<p class="text-danger small">No se pudo cargar PayPal. Recarga la página.</p>';
+            });
+        }
+    </script>
+}
+else
+{
+    <script>
+        document.getElementById('paypal-button-container').innerHTML =
+            '<p class="text-muted small">PayPal no disponible en esta sesión.</p>';
+    </script>
+}
+}

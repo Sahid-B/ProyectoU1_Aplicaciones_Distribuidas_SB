@@ -1,0 +1,41 @@
+@model MiniMarketApp.Models.Sucursal
+
+@{
+    ViewData["Title"] = "Editar Sucursal";
+}
+
+<h2 class="mb-4 text-primary fw-bold">Editar Sucursal</h2>
+<div class="row justify-content-center"><div class="col-md-8"><div class="card shadow-sm border-0 rounded-4"><div class="card-body p-4 p-md-5 bg-white">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="FechaCreacion" />
+            <div class="form-group mb-3">
+                <label asp-for="Nombre" class="control-label fw-bold text-muted mb-1"></label>
+                <input asp-for="Nombre" class="form-control form-control-lg bg-light" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Direccion" class="control-label fw-bold text-muted mb-1"></label>
+                <input asp-for="Direccion" class="form-control form-control-lg bg-light" />
+                <span asp-validation-for="Direccion" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Telefono" class="control-label fw-bold text-muted mb-1"></label>
+                <input asp-for="Telefono" class="form-control form-control-lg bg-light" />
+                <span asp-validation-for="Telefono" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check mb-3">
+                <label class="form-check-label fw-bold text-muted mb-1">
+                    <input class="form-check-input" asp-for="Activo" /> @Html.DisplayNameFor(model => model.Activo)
+                </label>
+            </div>
+            <div class="form-group mb-3">
+                <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm"><i class="bi bi-save"></i> Guardar Cambios</button>
+            </div>
+        </form></div></div></div></div><div class="mt-4"><a asp-action="Index" class="btn btn-secondary mt-3"><i class="bi bi-arrow-left"></i> Volver a la lista</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

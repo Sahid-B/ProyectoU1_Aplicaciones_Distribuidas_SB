@@ -1,0 +1,52 @@
+@page
+@model DeletePersonalDataModel
+@{
+    ViewData["Title"] = "Eliminar Cuenta";
+    ViewData["ActivePage"] = ManageNavPages.PersonalData;
+}
+
+<div class="row">
+    <div class="col-md-10 col-lg-8">
+        <div class="d-flex align-items-center gap-3 mb-3 text-danger">
+            <div class="bg-danger bg-opacity-10 p-3 rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                <i class="bi bi-trash3 fs-4"></i>
+            </div>
+            <div>
+                <h3 class="fw-bold mb-0">Eliminar Cuenta de Forma Permanente</h3>
+                <p class="text-muted small mb-0">Confirmación de eliminación de datos de usuario en Supermarket Rubik.</p>
+            </div>
+        </div>
+        <hr class="my-4 text-muted opacity-25" />
+
+        <div class="alert alert-danger border-0 shadow-sm rounded-4 p-4 mb-4">
+            <h5 class="fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i>¡Advertencia Importante!</h5>
+            <p class="mb-0">La eliminación de esta cuenta borrará de forma definitiva tus datos y accesos. Esta acción no se puede deshacer de ninguna manera.</p>
+        </div>
+
+        <form id="delete-user" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+            @if (Model.RequirePassword)
+            {
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Por favor ingresa tu contraseña." />
+                    <label asp-for="Input.Password" class="form-label">Contraseña de Confirmación</label>
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+            }
+
+            <div class="d-flex gap-3 mt-4">
+                <button class="btn btn-danger rounded-pill px-4 py-2 fw-semibold" type="submit">
+                    <i class="bi bi-trash3-fill me-1"></i> Eliminar Definitivamente
+                </button>
+                <a asp-page="PersonalData" class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-medium">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

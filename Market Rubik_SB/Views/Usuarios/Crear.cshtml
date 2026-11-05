@@ -1,0 +1,64 @@
+@model MiniMarketApp.Controllers.CrearUsuarioViewModel
+@{
+    ViewData["Title"] = "Crear Nuevo Usuario";
+}
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-gradient bg-primary text-white p-4 border-0">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                            <i class="bi bi-person-plus-fill fs-3"></i>
+                        </div>
+                        <div>
+                            <h4 class="fw-bold mb-0">Crear Nuevo Usuario</h4>
+                            <small class="text-white-50">Registro manual por el Administrador • Supermarket Rubik</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <form asp-action="Crear" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Email" class="form-control border-primary border-opacity-25" placeholder="correo@ejemplo.com" required autocomplete="off" />
+                            <label asp-for="Email">Correo Electrónico</label>
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Password" class="form-control border-primary border-opacity-25" placeholder="Contraseña segura" required autocomplete="new-password" />
+                            <label asp-for="Password">Contraseña</label>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <select asp-for="Rol" class="form-select border-primary border-opacity-25">
+                                <option value="Cliente">Cliente</option>
+                                <option value="Admin">Administrador (Admin)</option>
+                            </select>
+                            <label asp-for="Rol">Rol Asignado</label>
+                            <span asp-validation-for="Rol" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold flex-grow-1 shadow-sm">
+                                <i class="bi bi-person-check-fill me-1"></i> Crear Usuario
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-medium">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

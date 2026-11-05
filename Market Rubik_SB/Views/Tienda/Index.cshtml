@@ -1,0 +1,315 @@
+@model IEnumerable<MiniMarketApp.Models.Producto>
+@{
+    ViewData["Title"] = "Tienda Virtual - Supermarket Rubik";
+    var gruposCategorias = ViewBag.GruposCategorias as List<string> ?? new List<string>();
+    var currentSearch = ViewBag.CurrentSearch as string;
+    var currentCategoria = ViewBag.CurrentCategoria as string;
+    int paginaActual = ViewBag.PaginaActual ?? 1;
+    int totalPaginas = ViewBag.TotalPaginas ?? 1;
+    int totalProductos = ViewBag.TotalProductos ?? 0;
+
+    // Color e ícono por grupo
+    (string icon, string color, string bg) GetStyle(string? nombre)
+    {
+        var n = (nombre ?? "").ToLower();
+        if (n.StartsWith("fruta") || n.StartsWith("verdura")) return ("bi-apple", "#16a34a", "#dcfce7");
+        if (n.StartsWith("carne") || n.StartsWith("embutido")) return ("bi-egg-fried", "#dc2626", "#fee2e2");
+        if (n.StartsWith("lácteo") || n.StartsWith("lacteo")) return ("bi-cup-hot", "#2563eb", "#dbeafe");
+        if (n.StartsWith("bebida") || n.StartsWith("jugo") || n.StartsWith("licor")) return ("bi-cup-straw", "#7c3aed", "#ede9fe");
+        if (n.StartsWith("snack") || n.StartsWith("golosina")) return ("bi-emoji-smile", "#d97706", "#fef3c7");
+        if (n.StartsWith("abarrote") || n.StartsWith("pasta") || n.StartsWith("panadería") || n.StartsWith("panaderia")) return ("bi-basket", "#ca8a04", "#fef9c3");
+        if (n.StartsWith("limpieza") || n.StartsWith("hogar") || n.StartsWith("aseo")) return ("bi-house-heart", "#0891b2", "#cffafe");
+        if (n.StartsWith("higiene") || n.StartsWith("cosmético") || n.StartsWith("cosmetico") || n.StartsWith("cuidado")) return ("bi-heart", "#db2777", "#fce7f3");
+        if (n.StartsWith("farmacia")) return ("bi-capsule", "#059669", "#d1fae5");
+        if (n.StartsWith("mascota")) return ("bi-paw", "#92400e", "#fef3c7");
+        if (n.StartsWith("condimento") || n.StartsWith("salsa")) return ("bi-droplet", "#b45309", "#fef3c7");
+        if (n.StartsWith("congelado") || n.StartsWith("marino")) return ("bi-thermometer-snow", "#1d4ed8", "#dbeafe");
+        if (n.StartsWith("café") || n.StartsWith("cafe")) return ("bi-cup-hot", "#78350f", "#fef3c7");
+        if (n.StartsWith("papelería") || n.StartsWith("papeleria")) return ("bi-pencil", "#6d28d9", "#ede9fe");
+        if (n.StartsWith("ferretería") || n.StartsWith("ferreteria")) return ("bi-tools", "#374151", "#f3f4f6");
+        return ("bi-box-seam", "#1d4ed8", "#dbeafe");
+    }
+}
+
+<!-- BANNER PRINCIPAL -->
+<div style="background: linear-gradient(135deg, #1e3a5f 0%, #0d6efd 100%); padding: 2rem 0;">
+    <div class="container">
+        <div class="row align-items-center g-3">
+            <div class="col-md-8">
+                <span class="badge text-white fw-semibold mb-2 d-inline-block" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); padding: 6px 14px; border-radius: 50px; font-size: 0.8rem;">
+                    <i class="bi bi-shop me-1"></i> Tienda Virtual 24/7
+                </span>
+                <h1 class="fw-bolder text-white mb-1" style="font-size: 2.2rem;">Catálogo de Productos</h1>
+                <p class="text-white mb-0" style="opacity: 0.75;">
+                    <strong class="text-white" style="opacity: 1;">@totalProductos</strong> productos disponibles · Envíos en 45 min
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a asp-action="Carrito" class="btn btn-light fw-bold px-4 py-2 d-inline-flex align-items-center gap-2"
+                   style="border-radius: 14px; font-size: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                    <i class="bi bi-cart3 fs-5 text-primary"></i>
+                    <span class="text-dark">Mi Carrito</span>
+                    <span id="cart-badge" class="badge bg-danger rounded-pill" style="font-size: 0.8rem; min-width: 1.5rem;">
+                        @(ViewBag.CarritoItems ?? 0)
+                    </span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+    <div id="cartToast" class="toast align-items-center text-white bg-success border-0 shadow-lg rounded-4" role="alert" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body d-flex align-items-center gap-2 fw-medium">
+                <i class="bi bi-check-circle-fill fs-5"></i>
+                <span id="toastMessage">Producto añadido.</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<div class="container my-4">
+
+    
+    <!-- BUSCADOR Y FILTRO -->
+    <div class="bg-white rounded-4 shadow-sm p-3 mb-4 border">
+        <form asp-action="Index" method="get" id="filtroForm" class="row g-2 align-items-center">
+            <input type="hidden" name="pagina" value="1" />
+            <div class="col-md-8">
+                <div class="input-group">
+                    <span class="input-group-text border-0 bg-light rounded-start-pill" style="padding-left: 16px;">
+                        <i class="bi bi-search text-muted"></i>
+                    </span>
+                    <input type="text" name="search" value="@currentSearch"
+                           class="form-control border-0 bg-light rounded-end-pill py-2"
+                           placeholder="Buscar productos..." />
+                </div>
+            </div>
+            <div class="col-md-4 d-flex gap-2">
+                <select name="categoria" class="form-select border-0 bg-light rounded-pill py-2" onchange="document.getElementById('filtroForm').submit()">
+                    <option value="">Todas las Categorías</option>
+                    @foreach (var grupo in gruposCategorias)
+                    {
+                        if (currentCategoria == grupo)
+                        {
+                            <option value="@grupo" selected>@grupo</option>
+                        }
+                        else
+                        {
+                            <option value="@grupo">@grupo</option>
+                        }
+                    }
+                </select>
+                @if (!string.IsNullOrEmpty(currentSearch) || !string.IsNullOrEmpty(currentCategoria))
+                {
+                    <a asp-action="Index" class="btn btn-danger rounded-pill px-3 flex-shrink-0" title="Limpiar filtros">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                }
+            </div>
+        </form>
+    </div>
+
+    <!-- PROMOCIONES BANNER -->
+    @if (ViewBag.Promociones != null && ((IEnumerable<MiniMarketApp.Models.Promocion>)ViewBag.Promociones).Any())
+    {
+        var promos = (IEnumerable<MiniMarketApp.Models.Promocion>)ViewBag.Promociones;
+        <div class="alert alert-warning shadow-sm border-warning rounded-4 mb-4 d-flex align-items-center" style="background: linear-gradient(to right, #fffbeb, #fef3c7);">
+            <div class="bg-warning text-dark rounded-circle p-2 me-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                <i class="bi bi-tag-fill fs-4"></i>
+            </div>
+            <div>
+                <h5 class="fw-bold mb-1 text-dark">¡Ofertas Especiales Activas!</h5>
+                <ul class="mb-0 ps-3 text-dark fw-medium" style="font-size: 0.95rem;">
+                @foreach(var promo in promos)
+                {
+                    <li><strong>@promo.Nombre:</strong> Descuento del @promo.ValorDescuento@(promo.TipoDescuento == "Porcentaje" ? "%" : "$") en @(promo.ProductoId != null ? "productos seleccionados" : (promo.CategoriaId != null ? "una categoría específica" : "tus compras")).</li>
+                }
+                </ul>
+            </div>
+        </div>
+    }
+
+    <!-- INFO RESULTADOS -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            @if (!string.IsNullOrEmpty(currentCategoria))
+            {
+                var (ci, cc, cb) = GetStyle(currentCategoria);
+                <span class="badge rounded-pill px-3 py-2 fw-semibold" style="background: @cb; color: @cc; border: 1px solid @cc; font-size: 0.82rem;">
+                    <i class="bi @ci me-1"></i>@currentCategoria
+                </span>
+            }
+            <span class="text-muted small"><strong>@totalProductos</strong> resultado(s)</span>
+        </div>
+        <span class="text-muted small fw-semibold">Pág. @paginaActual / @totalPaginas</span>
+    </div>
+
+    <!-- GRID DE PRODUCTOS -->
+    @if (Model != null && Model.Any())
+    {
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 g-3 mb-4">
+            @foreach (var item in Model)
+            {
+                var catNombre = item.Categoria?.Nombre ?? "General";
+                var grupoNombre = catNombre.Split(' ')[0];
+                var (icono, colorHex, bgHex) = GetStyle(grupoNombre);
+
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden product-card-hover" style="transition: transform 0.2s, box-shadow 0.2s;">
+                        <!-- Franja de color + ícono -->
+                        <div class="text-center py-3" style="background: @bgHex;">
+                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm"
+                                 style="width: 60px; height: 60px; background: @colorHex;">
+                                <i class="bi @icono text-white fs-3"></i>
+                            </div>
+                        </div>
+
+                        <div class="card-body px-3 py-2 text-center bg-white">
+                            <!-- Categoría badge -->
+                            <span class="badge rounded-pill mb-2 fw-normal" style="background: @bgHex; color: @colorHex; font-size: 0.7rem; border: 1px solid @colorHex; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;">
+                                @catNombre
+                            </span>
+
+                            <!-- Nombre del producto -->
+                            <h6 class="fw-bold text-dark lh-sm mb-1" style="font-size: 0.88rem; min-height: 36px;">
+                                @item.Nombre
+                            </h6>
+
+                            <!-- Estrellas -->
+                            <div class="text-warning mb-2" style="font-size: 0.7rem;">
+                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                            </div>
+
+                            <!-- Stock -->
+                            <span class="badge rounded-pill mb-2" style="background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; font-size: 0.72rem;">
+                                <i class="bi bi-check-circle me-1"></i>Stock: <span data-stock="@item.Id">@item.Stock</span>
+                            </span>
+
+                            <!-- Precio -->
+                            <div class="fw-bolder text-primary" style="font-size: 1.25rem;">
+                                @item.Precio.ToString("C")
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white border-0 pb-3 px-3 pt-0">
+                            <button type="button"
+                                    onclick="agregarAlCarrito(@item.Id, '@Html.Raw(item.Nombre.Replace("'", "\\'"))')"
+                                    class="btn btn-primary w-100 fw-bold rounded-pill py-2 d-flex align-items-center justify-content-center gap-2"
+                                    style="font-size: 0.9rem;">
+                                <i class="bi bi-cart-plus-fill"></i>
+                                Añadir al Carrito
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- PAGINACIÓN -->
+        @if (totalPaginas > 1)
+        {
+            <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap mt-2 mb-4">
+                @if (paginaActual > 1)
+                {
+                    <a asp-action="Index" asp-route-search="@currentSearch" asp-route-categoria="@currentCategoria" asp-route-pagina="@(paginaActual - 1)"
+                       class="btn btn-outline-primary rounded-pill px-4">
+                        <i class="bi bi-chevron-left"></i> Anterior
+                    </a>
+                }
+                else
+                {
+                    <button class="btn btn-outline-secondary rounded-pill px-4" disabled><i class="bi bi-chevron-left"></i> Anterior</button>
+                }
+
+                @{ int pS = Math.Max(1, paginaActual - 2); int pE = Math.Min(totalPaginas, paginaActual + 2); }
+
+                @if (pS > 1)
+                {
+                    <a asp-action="Index" asp-route-search="@currentSearch" asp-route-categoria="@currentCategoria" asp-route-pagina="1" class="btn btn-outline-secondary rounded-pill px-3">1</a>
+                    @if (pS > 2) { <span class="text-muted">…</span> }
+                }
+                @for (int p = pS; p <= pE; p++)
+                {
+                    if (p == paginaActual)
+                    {
+                        <button class="btn btn-primary rounded-pill px-3 fw-bold">@p</button>
+                    }
+                    else
+                    {
+                        <a asp-action="Index" asp-route-search="@currentSearch" asp-route-categoria="@currentCategoria" asp-route-pagina="@p" class="btn btn-outline-secondary rounded-pill px-3">@p</a>
+                    }
+                }
+                @if (pE < totalPaginas)
+                {
+                    @if (pE < totalPaginas - 1) { <span class="text-muted">…</span> }
+                    <a asp-action="Index" asp-route-search="@currentSearch" asp-route-categoria="@currentCategoria" asp-route-pagina="@totalPaginas" class="btn btn-outline-secondary rounded-pill px-3">@totalPaginas</a>
+                }
+
+                @if (paginaActual < totalPaginas)
+                {
+                    <a asp-action="Index" asp-route-search="@currentSearch" asp-route-categoria="@currentCategoria" asp-route-pagina="@(paginaActual + 1)"
+                       class="btn btn-primary rounded-pill px-4">
+                        Siguiente <i class="bi bi-chevron-right"></i>
+                    </a>
+                }
+                else
+                {
+                    <button class="btn btn-outline-secondary rounded-pill px-4" disabled>Siguiente <i class="bi bi-chevron-right"></i></button>
+                }
+            </div>
+            <p class="text-center text-muted small">
+                Mostrando @((paginaActual - 1) * 30 + 1)–@(Math.Min(paginaActual * 30, totalProductos)) de @totalProductos productos
+            </p>
+        }
+    }
+    else
+    {
+        <div class="text-center py-5 my-4 bg-white rounded-4 shadow-sm border">
+            <i class="bi bi-search fs-1 text-secondary mb-3 d-block"></i>
+            <h4 class="fw-bold text-dark">Sin resultados</h4>
+            <p class="text-muted mb-4">
+                @if (!string.IsNullOrEmpty(currentCategoria))
+                { <span>No hay productos en <strong>@currentCategoria</strong>.</span> }
+                else
+                { <span>Intenta con otros términos de búsqueda.</span> }
+            </p>
+            <a asp-action="Index" class="btn btn-primary rounded-pill px-4">Ver Todo el Catálogo</a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+<style>
+    .product-card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.12) !important;
+    }
+</style>
+<script>
+    function agregarAlCarrito(id, nombre) {
+        $.ajax({
+            url: '/Tienda/AgregarAlCarrito',
+            type: 'POST',
+            data: { productoId: id },
+            success: function(data) {
+                if (data.success) {
+                    $('#cart-badge').text(data.totalItems);
+                    $('#toastMessage').text('¡' + nombre + ' añadido al carrito!');
+                    var toast = new bootstrap.Toast(document.getElementById('cartToast'), { delay: 2500 });
+                    toast.show();
+                } else {
+                    alert(data.message || 'Error al añadir al carrito.');
+                }
+            },
+            error: function(xhr) {
+                console.error('Error AJAX:', xhr.status, xhr.responseText);
+                alert('Error de conexión. Código: ' + xhr.status);
+            }
+        });
+    }
+</script>
+}

@@ -1,0 +1,189 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+html {
+  font-size: 14px;
+  position: relative;
+  min-height: 100%;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f8f9fa;
+  color: #2c3e50;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container-body-wrapper {
+    flex: 1 0 auto;
+}
+
+/* Custom modern aesthetics */
+.card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.btn {
+    border-radius: 10px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.25rem rgba(37, 140, 251, 0.25);
+  border-color: #258cfb;
+}
+
+.form-control {
+    border-radius: 10px;
+    padding: 0.6rem 1rem;
+    border: 1px solid #dee2e6;
+}
+
+/* Navbar gradient azul royal */
+.navbar {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15) !important;
+}
+
+/* Navbar links styling */
+.nav-link.custom-hover {
+    transition: all 0.25s ease;
+    border-radius: 20px;
+    padding: 0.5rem 1rem !important;
+    margin: 0 0.2rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.nav-link.custom-hover:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    opacity: 1 !important;
+}
+
+/* Hero Banner Azul con texto 100% visible */
+.hero-banner-custom {
+    background: linear-gradient(135deg, #0d6efd 0%, #004085 100%) !important;
+    color: #ffffff !important;
+    border-radius: 24px;
+    box-shadow: 0 12px 35px rgba(13, 110, 253, 0.3) !important;
+}
+
+.hero-banner-custom h1, 
+.hero-banner-custom h2, 
+.hero-banner-custom h3, 
+.hero-banner-custom p,
+.hero-banner-custom span {
+    color: #ffffff !important;
+}
+
+/* Banner Chef IA */
+.chef-ia-banner {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
+    color: #ffffff !important;
+    border-radius: 24px;
+}
+
+.chef-ia-banner h1,
+.chef-ia-banner h2,
+.chef-ia-banner h3,
+.chef-ia-banner p {
+    color: #ffffff !important;
+}
+
+/* Categorías destacadas */
+.custom-category-card {
+    transition: all 0.25s ease;
+    border: 1px solid #e9ecef !important;
+    background-color: #ffffff;
+}
+
+.custom-category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(13, 110, 253, 0.15) !important;
+    border-color: #0d6efd !important;
+}
+
+/* Footer layout fix (Evita superposición) */
+footer.footer {
+    position: relative !important;
+    bottom: auto !important;
+    width: 100%;
+    margin-top: auto;
+    clear: both;
+}
+
+/* Authentication & 2FA Visual Improvements */
+.auth-card {
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(13, 110, 253, 0.08) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08) !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.auth-card:hover {
+    box-shadow: 0 20px 45px rgba(13, 110, 253, 0.12) !important;
+}
+
+.letter-spacing-2 {
+    letter-spacing: 0.25em !important;
+}
+
+.security-badge-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.security-badge-wrapper::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    animation: securityPulse 2s infinite;
+}
+
+@keyframes securityPulse {
+    0% {
+        transform: scale(0.95);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.3;
+    }
+    100% {
+        transform: scale(0.95);
+        opacity: 0.8;
+    }
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}

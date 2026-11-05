@@ -1,0 +1,47 @@
+@model IEnumerable<MiniMarketApp.ViewModels.ComprasPorProveedorDto>
+@{
+    ViewData["Title"] = "Compras por Proveedor";
+}
+
+<div class="container mt-4">
+    <h2>Reporte de Compras por Proveedor (Top 15)</h2>
+    
+        <form method="get" class="row g-3 mb-4">
+        <div class="col-md-4">
+            <label class="form-label">Fecha Desde</label>
+            <input type="date" name="fechaInicio" class="form-control" value="@ViewBag.FechaInicio" />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Fecha Hasta</label>
+            <input type="date" name="fechaFin" class="form-control" value="@ViewBag.FechaFin" />
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel"></i> Filtrar</button>
+            <a href="?fechaInicio=&fechaFin=" class="btn btn-secondary ms-2 w-100"><i class="bi bi-eraser"></i> Limpiar</a>
+        </div>
+    </form>
+<div id="reporte-pdf">
+        <table class="table table-striped table-bordered mt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th>Proveedor</th>
+                    <th>Órdenes de Compra</th>
+                    <th>Total Invertido</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Proveedor</td>
+                        <td>@item.CantidadCompras</td>
+                        <td>@item.TotalInvertido.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <a asp-action="Index" class="btn btn-secondary mt-3"><i class="bi bi-arrow-left"></i> Volver a Reportes</a>
+    </div>
+</div>
+
+

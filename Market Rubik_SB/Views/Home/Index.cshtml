@@ -1,0 +1,389 @@
+@model IEnumerable<MiniMarketApp.Models.Producto>
+@{
+    ViewData["Title"] = "Inicio - Supermarket Rubik";
+    var userEmail = User.Identity?.Name ?? "";
+    bool esAdmin = User.Identity?.IsAuthenticated == true && (User.IsInRole("Admin") || userEmail.Equals("admin@marketrubik.com", StringComparison.OrdinalIgnoreCase));
+}
+
+<div class="container-fluid p-0 mb-5">
+    @if (esAdmin)
+    {
+        <!-- Admin Dashboard Header -->
+        <div class="admin-hero text-white p-5 text-center shadow-lg position-relative overflow-hidden mb-4 rounded-bottom-4">
+            <div class="admin-hero-bg"></div>
+            <div class="position-relative z-1">
+                <span class="badge bg-warning text-dark px-4 py-2 rounded-pill fw-bolder mb-4 fs-6 shadow border border-warning" style="letter-spacing: 0.5px;">
+                    <i class="bi bi-shield-lock-fill me-2"></i> Modo Administrador
+                </span>
+                <h1 class="display-4 fw-bolder mb-3 text-white" style="letter-spacing: -1px; text-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                    Panel de Administración
+                </h1>
+                <p class="fs-5 text-light opacity-75 mb-5 mx-auto" style="max-width: 650px; font-weight: 300;">
+                    Gestión integral y avanzada de Supermarket Rubik. Controla ventas, inventario y métricas desde un solo lugar.
+                </p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a asp-controller="Ventas" asp-action="Create" class="btn btn-warning btn-lg rounded-pill px-5 fw-bold shadow-lg admin-btn hover-scale">
+                        <i class="bi bi-receipt me-2"></i> Nueva Venta
+                    </a>
+                    <a asp-controller="Productos" asp-action="Index" class="btn btn-outline-light btn-lg rounded-pill px-4 shadow-sm admin-btn hover-scale backdrop-blur">
+                        <i class="bi bi-box-seam me-2"></i> Inventario
+                    </a>
+                    <a asp-controller="Usuarios" asp-action="Index" class="btn btn-outline-light btn-lg rounded-pill px-4 shadow-sm admin-btn hover-scale backdrop-blur">
+                        <i class="bi bi-people me-2"></i> Usuarios
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Client Hero Carousel -->
+        <div id="homeCarousel" class="carousel slide carousel-fade shadow-sm border-bottom" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            </div>
+            <div class="carousel-inner" style="max-height: 500px;">
+                <!-- Slide 1 -->
+                <div class="carousel-item active" data-bs-interval="4000">
+                    <img src="~/images/carousel1.png" class="d-block w-100" alt="Supermarket Rubik Ofertas" style="object-fit: cover; object-position: center; height: 500px;">
+                    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.5);"></div>
+                    <div class="carousel-caption d-flex flex-column align-items-center justify-content-center h-100 bottom-0">
+                        <span class="badge bg-success bg-opacity-75 px-3 py-2 rounded-pill fw-bold mb-3 fs-6 shadow-sm border border-success">
+                            <i class="bi bi-tag-fill me-2"></i> Ofertas Especiales
+                        </span>
+                        <h1 class="display-3 fw-bolder mb-3 text-white text-shadow-sm" style="text-shadow: 2px 2px 8px rgba(0,0,0,0.5);">
+                            Descuentos de Locura
+                        </h1>
+                        <p class="fs-5 mb-4 text-light text-shadow-sm" style="max-width: 600px; text-shadow: 1px 1px 5px rgba(0,0,0,0.5);">
+                            Encuentra los mejores precios en productos seleccionados cada semana. ¡Aprovecha antes de que se agoten!
+                        </p>
+                        <a asp-controller="Tienda" asp-action="Index" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow">
+                            <i class="bi bi-cart3 me-2"></i> Comprar Ahora
+                        </a>
+                    </div>
+                </div>
+                <!-- Slide 2 -->
+                <div class="carousel-item" data-bs-interval="4000">
+                    <img src="~/images/carousel2.png" class="d-block w-100" alt="Productos Frescos" style="object-fit: cover; object-position: center; height: 500px;">
+                    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.5);"></div>
+                    <div class="carousel-caption d-flex flex-column align-items-center justify-content-center h-100 bottom-0">
+                        <span class="badge bg-warning text-dark bg-opacity-75 px-3 py-2 rounded-pill fw-bold mb-3 fs-6 shadow-sm border border-warning">
+                            <i class="bi bi-basket-fill me-2"></i> Frescura Garantizada
+                        </span>
+                        <h1 class="display-3 fw-bolder mb-3 text-white" style="text-shadow: 2px 2px 8px rgba(0,0,0,0.5);">
+                            Del Campo a Tu Mesa
+                        </h1>
+                        <p class="fs-5 mb-4 text-light" style="max-width: 600px; text-shadow: 1px 1px 5px rgba(0,0,0,0.5);">
+                            Seleccionamos minuciosamente las mejores frutas y verduras para ti y tu familia.
+                        </p>
+                        <a asp-controller="Tienda" asp-action="Index" class="btn btn-warning btn-lg rounded-pill px-5 py-3 fw-bold shadow">
+                            <i class="bi bi-shop me-2"></i> Ver Catálogo
+                        </a>
+                    </div>
+                </div>
+                <!-- Slide 3 -->
+                <div class="carousel-item" data-bs-interval="4000">
+                    <img src="~/images/hero.png" class="d-block w-100" alt="Delivery Rápido" style="object-fit: cover; object-position: center; height: 500px;">
+                    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.5);"></div>
+                    <div class="carousel-caption d-flex flex-column align-items-center justify-content-center h-100 bottom-0">
+                        <span class="badge bg-info text-dark bg-opacity-75 px-3 py-2 rounded-pill fw-bold mb-3 fs-6 shadow-sm border border-info">
+                            <i class="bi bi-truck me-2"></i> Delivery Express
+                        </span>
+                        <h1 class="display-3 fw-bolder mb-3 text-white" style="text-shadow: 2px 2px 8px rgba(0,0,0,0.5);">
+                            A Un Clic de Distancia
+                        </h1>
+                        <p class="fs-5 mb-4 text-light" style="max-width: 600px; text-shadow: 1px 1px 5px rgba(0,0,0,0.5);">
+                            Haz tus compras de la semana sin salir de casa y recibe en menos de 45 minutos.
+                        </p>
+                        <a asp-controller="Tienda" asp-action="Index" class="btn btn-info text-dark btn-lg rounded-pill px-5 py-3 fw-bold shadow">
+                            <i class="bi bi-lightning-charge-fill me-2"></i> Pide Ya
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#homeCarousel" data-bs-slide="prev" style="width: 5%;">
+                <span class="carousel-control-prev-icon p-3 bg-dark bg-opacity-50 rounded-circle" aria-hidden="true"></span>
+                <span class="visually-hidden">Anterior</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#homeCarousel" data-bs-slide="next" style="width: 5%;">
+                <span class="carousel-control-next-icon p-3 bg-dark bg-opacity-50 rounded-circle" aria-hidden="true"></span>
+                <span class="visually-hidden">Siguiente</span>
+            </button>
+        </div>
+    }
+</div>
+
+<div class="container my-5">
+    @if (esAdmin)
+    {
+        <!-- Admin Dashboard Metrics -->
+        <div class="row g-4 mb-5 admin-metrics mt-2">
+            <div class="col-md-6">
+                <div class="card admin-metric-card border-0 shadow rounded-4 h-100 bg-white position-relative overflow-hidden">
+                    <div class="card-body p-5 text-center position-relative z-1">
+                        <div class="metric-icon-wrapper bg-success bg-gradient text-white rounded-circle d-inline-flex p-4 mb-4 shadow-sm">
+                            <i class="bi bi-people-fill fs-2"></i>
+                        </div>
+                        <h5 class="text-muted fw-bold mb-2 text-uppercase" style="letter-spacing: 1.5px; font-size: 0.85rem;">Clientes Activos</h5>
+                        <h1 class="display-3 fw-bolder text-dark mb-4 metric-value" style="letter-spacing: -2px;">@ViewBag.TotalClientes</h1>
+                        <a asp-controller="Clientes" asp-action="Index" class="btn btn-success btn-lg rounded-pill px-5 fw-bold shadow-sm hover-scale">
+                            Gestionar Clientes <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                    <div class="metric-bg-shape bg-success"></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card admin-metric-card border-0 shadow rounded-4 h-100 bg-white position-relative overflow-hidden">
+                    <div class="card-body p-5 text-center position-relative z-1">
+                        <div class="metric-icon-wrapper bg-primary bg-gradient text-white rounded-circle d-inline-flex p-4 mb-4 shadow-sm">
+                            <i class="bi bi-graph-up-arrow fs-2"></i>
+                        </div>
+                        <h5 class="text-muted fw-bold mb-2 text-uppercase" style="letter-spacing: 1.5px; font-size: 0.85rem;">Ventas Registradas</h5>
+                        <h1 class="display-3 fw-bolder text-dark mb-4 metric-value" style="letter-spacing: -2px;"><span data-sales-count>@ViewBag.TotalVentas</span></h1>
+                        @if (User.IsInRole("Admin")) { <p>Total vendido: <strong data-sales-total>…</strong></p> }
+                        <a asp-controller="Ventas" asp-action="Index" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm hover-scale">
+                            Ver Historial <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                    <div class="metric-bg-shape bg-primary"></div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        @if (ViewBag.Promociones != null && ((IEnumerable<MiniMarketApp.Models.Promocion>)ViewBag.Promociones).Any())
+        {
+            var promos = (IEnumerable<MiniMarketApp.Models.Promocion>)ViewBag.Promociones;
+            <div class="mb-5 mt-4">
+                @foreach (var promo in promos)
+                {
+                    <div class="alert alert-warning mb-3 shadow-sm border-0 d-flex align-items-center" role="alert" style="background-color: #fff8e1; border-left: 4px solid #ffc107 !important;">
+                        <div class="me-3 text-warning">
+                            <i class="bi bi-tag-fill fs-3"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1 text-dark">¡Ofertas Especiales Activas!</h5>
+                            <p class="mb-0 text-muted">
+                                <strong>@promo.Nombre</strong> : Descuento del @promo.ValorDescuento.ToString("0.00")@(promo.TipoDescuento == "Porcentaje" ? "%" : "$") en @(promo.ProductoId != null ? "productos seleccionados" : (promo.CategoriaId != null ? "una categoría específica" : "tus compras")).
+                            </p>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <!-- Features Section -->
+        <div class="row g-4 mb-5 text-center mt-3">
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100 p-4 bg-white hover-lift">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle mx-auto p-3 mb-3 d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                        <i class="bi bi-truck fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-1">Envío Rápido</h5>
+                    <p class="text-muted small mb-0">En tu puerta en 45 min</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100 p-4 bg-white hover-lift">
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle mx-auto p-3 mb-3 d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                        <i class="bi bi-award fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-1">Calidad Premium</h5>
+                    <p class="text-muted small mb-0">Selección garantizada</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100 p-4 bg-white hover-lift">
+                    <div class="bg-warning bg-opacity-10 text-warning rounded-circle mx-auto p-3 mb-3 d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                        <i class="bi bi-tags fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-1">Mejores Precios</h5>
+                    <p class="text-muted small mb-0">Descuentos exclusivos</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100 p-4 bg-white hover-lift">
+                    <div class="bg-info bg-opacity-10 text-info rounded-circle mx-auto p-3 mb-3 d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                        <i class="bi bi-shield-check fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-1">Pago Seguro</h5>
+                    <p class="text-muted small mb-0">100% Protegido</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories Section -->
+        <div class="mb-5 bg-white p-4 p-md-5 rounded-4 shadow-sm border">
+            <div class="d-flex justify-content-between align-items-end mb-4">
+                <div>
+                    <h2 class="fw-bolder text-dark mb-0">Explora por Categorías</h2>
+                    <p class="text-muted mb-0">Encuentra rápidamente lo que necesitas</p>
+                </div>
+                <a asp-controller="Tienda" asp-action="Index" class="btn btn-outline-primary rounded-pill px-4 fw-bold d-none d-md-inline-block">Ver Catálogo</a>
+            </div>
+            <div class="row row-cols-2 row-cols-md-4 g-4">
+                <div class="col">
+                    <a asp-controller="Tienda" asp-action="Index" class="card bg-light border-0 rounded-4 text-center p-4 text-decoration-none hover-lift h-100">
+                        <i class="bi bi-apple display-4 text-danger mb-3"></i>
+                        <h6 class="fw-bold text-dark mb-0">Frutas y Verduras</h6>
+                    </a>
+                </div>
+                <div class="col">
+                    <a asp-controller="Tienda" asp-action="Index" class="card bg-light border-0 rounded-4 text-center p-4 text-decoration-none hover-lift h-100">
+                        <i class="bi bi-cup-hot display-4 text-info mb-3"></i>
+                        <h6 class="fw-bold text-dark mb-0">Lácteos</h6>
+                    </a>
+                </div>
+                <div class="col">
+                    <a asp-controller="Tienda" asp-action="Index" class="card bg-light border-0 rounded-4 text-center p-4 text-decoration-none hover-lift h-100">
+                        <i class="bi bi-basket display-4 text-warning mb-3"></i>
+                        <h6 class="fw-bold text-dark mb-0">Abarrotes</h6>
+                    </a>
+                </div>
+                <div class="col">
+                    <a asp-controller="Tienda" asp-action="Index" class="card bg-light border-0 rounded-4 text-center p-4 text-decoration-none hover-lift h-100">
+                        <i class="bi bi-egg-fried display-4 text-success mb-3"></i>
+                        <h6 class="fw-bold text-dark mb-0">Carnes</h6>
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Featured Products -->
+    <div class="mb-4 d-flex justify-content-between align-items-center mt-5">
+        <h2 class="fw-bolder text-dark mb-0">Novedades Destacadas</h2>
+        @if (!esAdmin)
+        {
+            <a asp-controller="Tienda" asp-action="Index" class="text-primary text-decoration-none fw-bold bg-primary bg-opacity-10 px-3 py-1 rounded-pill">Ver más &rarr;</a>
+        }
+    </div>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4 mb-5">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var producto in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 bg-white rounded-4 overflow-hidden hover-lift">
+                        <div class="card-body p-4 text-center">
+                            <span class="badge bg-light text-dark border px-3 py-1 rounded-pill mb-3">
+                                @(producto.Categoria?.Nombre ?? "General")
+                            </span>
+                            <div class="text-warning mb-2">
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                            </div>
+                            <h5 class="card-title fw-bold text-dark mb-2">@producto.Nombre</h5>
+                            <p class="card-text text-muted small mb-3" style="min-height: 40px;">
+                                @(string.IsNullOrEmpty(producto.Descripcion) ? "Excelente producto de Supermarket Rubik." : (producto.Descripcion.Length > 50 ? producto.Descripcion.Substring(0, 50) + "..." : producto.Descripcion))
+                            </p>
+                            <h4 class="text-primary fw-bolder mb-0">@producto.Precio.ToString("C")</h4>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 p-4 pt-0 text-center">
+                            @if (esAdmin)
+                            {
+                                <a asp-controller="Productos" asp-action="Edit" asp-route-id="@producto.Id" class="btn btn-dark rounded-pill w-100 fw-bold shadow-sm hover-scale">
+                                    <i class="bi bi-pencil-square me-1"></i> Editar
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Tienda" asp-action="Index" class="btn btn-primary rounded-pill w-100 fw-bold shadow-sm">
+                                    <i class="bi bi-cart-plus me-1"></i> Comprar
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center text-muted py-5 bg-light rounded-4 w-100">
+                <i class="bi bi-inbox fs-1 mb-3 d-block text-secondary"></i>
+                <h5 class="fw-bold">No hay productos destacados</h5>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .hover-lift {
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+    }
+    .hover-lift:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+    }
+    
+    /* Admin specific styles */
+    .admin-hero {
+        background: #121519;
+        border-bottom: 4px solid #ffc107;
+    }
+    .admin-hero-bg {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(circle at top right, rgba(255,193,7,0.15) 0%, transparent 40%),
+                    radial-gradient(circle at bottom left, rgba(13,110,253,0.1) 0%, transparent 40%);
+        z-index: 0;
+    }
+    .z-1 { z-index: 1; }
+    
+    .hover-scale {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hover-scale:hover {
+        transform: scale(1.05);
+    }
+    .backdrop-blur {
+        background: rgba(255,255,255,0.05);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    .backdrop-blur:hover {
+        background: rgba(255,255,255,0.15);
+        color: white;
+    }
+    
+    .admin-metric-card {
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 1px solid rgba(0,0,0,0.05) !important;
+    }
+    .admin-metric-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.12) !important;
+    }
+    .metric-icon-wrapper {
+        width: 80px; height: 80px;
+        display: inline-flex; align-items: center; justify-content: center;
+        transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .admin-metric-card:hover .metric-icon-wrapper {
+        transform: scale(1.15) rotate(5deg);
+    }
+    .metric-value {
+        color: #1a1e23 !important;
+    }
+    .metric-bg-shape {
+        position: absolute;
+        width: 300px; height: 300px;
+        border-radius: 50%;
+        bottom: -150px; right: -150px;
+        opacity: 0.04;
+        z-index: 0;
+        transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .admin-metric-card:hover .metric-bg-shape {
+        transform: scale(1.3);
+    }
+</style>

@@ -1,0 +1,169 @@
+@{
+    ViewData["Title"] = "Chef & Presupuesto IA";
+    bool isOnline = ViewBag.IsAiOnline ?? true;
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <!-- Header Azul Original -->
+                <div class="card-header bg-gradient bg-primary text-white p-4 border-0">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 54px; height: 54px;">
+                                <i class="bi bi-magic fs-3"></i>
+                            </div>
+                            <div>
+                                <h4 class="fw-bold mb-0">Chef & Presupuesto IA</h4>
+                                <small class="text-white-50">Impulsado por Ollama qwen2.5:1.5b • Supermarket Rubik</small>
+                            </div>
+                        </div>
+                        <div>
+                            @if (isOnline)
+                            {
+                                <span class="badge bg-light text-primary rounded-pill px-3 py-2 fw-medium">
+                                    <i class="bi bi-circle-fill me-1 small"></i> En Línea
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark rounded-pill px-3 py-2 fw-medium">
+                                    <i class="bi bi-exclamation-triangle me-1"></i> Modo Asistente
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Body -->
+                <div class="card-body p-4 bg-light" id="chatWindow" style="height: 440px; overflow-y: auto;">
+                    <!-- Mensaje Inicial -->
+                    <div class="d-flex mb-3">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="bi bi-robot fs-5"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white p-3 rounded-4 shadow-sm border border-light" style="max-width: 80%;">
+                            <p class="mb-1 text-dark fw-medium">¡Hola! Soy tu <strong>Chef & Asistente de Presupuesto</strong> en Supermarket Rubik. 👨‍🍳</p>
+                            <p class="mb-0 text-muted small">Dime qué ingredientes tienes o qué deseas cocinar hoy, y te sugeriré recetas deliciosas estimando tu presupuesto con nuestros productos.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Suggested Chips Azul -->
+                <div class="px-4 py-2 bg-white border-top border-light d-flex gap-2 flex-wrap">
+                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="usarSugerencia('¿Qué receta puedo preparar con pollo, arroz y vegetales?')">
+                        🍲 Receta con Pollo y Arroz
+                    </button>
+                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="usarSugerencia('Tengo $10 dólares, ¿qué menú me recomiendas?')">
+                        💰 Menú por $10 USD
+                    </button>
+                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="usarSugerencia('Dame una idea de cena saludable y rápida')">
+                        🥗 Cena Saludable
+                    </button>
+                </div>
+
+                <!-- Input Footer -->
+                <div class="card-footer bg-white p-3 border-top border-light">
+                    <form id="chatForm" onsubmit="enviarMensaje(event)">
+                        <div class="input-group">
+                            <input type="text" id="userInput" class="form-control border border-2 border-primary border-opacity-25 rounded-start-pill px-4 py-2" placeholder="Pregúntame una receta o tu presupuesto disponible..." required autocomplete="off">
+                            <button class="btn btn-primary rounded-end-pill px-4" type="submit" id="sendBtn">
+                                <i class="bi bi-send-fill me-1"></i> Preguntar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function usarSugerencia(texto) {
+        document.getElementById('userInput').value = texto;
+        enviarMensaje(new Event('submit'));
+    }
+
+    async function enviarMensaje(e) {
+        e.preventDefault();
+        const input = document.getElementById('userInput');
+        const prompt = input.value.trim();
+        if (!prompt) return;
+
+        const chatWindow = document.getElementById('chatWindow');
+        const sendBtn = document.getElementById('sendBtn');
+
+        // Agregar mensaje del usuario
+        chatWindow.innerHTML += `
+            <div class="d-flex mb-3 justify-content-end">
+                <div class="bg-primary text-white p-3 rounded-4 shadow-sm" style="max-width: 80%;">
+                    <p class="mb-0">${prompt}</p>
+                </div>
+            </div>
+        `;
+
+        input.value = '';
+        sendBtn.disabled = true;
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+
+        // Indicador de escribiendo
+        const typingId = 'typing_' + Date.now();
+        chatWindow.innerHTML += `
+            <div class="d-flex mb-3" id="${typingId}">
+                <div class="flex-shrink-0 me-3">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="bi bi-robot fs-5"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-3 rounded-4 shadow-sm border border-light">
+                    <div class="spinner-dots d-flex gap-1 align-items-center">
+                        <span class="spinner-grow spinner-grow-sm text-primary" role="status"></span>
+                        <span class="text-muted small ms-1">Consultando Ollama (qwen2.5:1.5b)...</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+
+        try {
+            const res = await fetch('/AI/ConsultarCliente', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: prompt })
+            });
+            const data = await res.json();
+
+            document.getElementById(typingId).remove();
+
+            chatWindow.innerHTML += `
+                <div class="d-flex mb-3">
+                    <div class="flex-shrink-0 me-3">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="bi bi-robot fs-5"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white p-3 rounded-4 shadow-sm border border-light" style="max-width: 80%;">
+                        <p class="mb-0 text-dark">${data.response.replace(/\n/g, '<br>')}</p>
+                    </div>
+                </div>
+            `;
+        } catch (err) {
+            document.getElementById(typingId).remove();
+            chatWindow.innerHTML += `
+                <div class="d-flex mb-3">
+                    <div class="bg-danger bg-opacity-10 text-danger p-3 rounded-4 border border-danger border-opacity-25">
+                        Error al conectar con la IA. Por favor intenta de nuevo.
+                    </div>
+                </div>
+            `;
+        } finally {
+            sendBtn.disabled = false;
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+    }
+</script>
+}

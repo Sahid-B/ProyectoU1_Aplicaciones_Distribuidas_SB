@@ -1,0 +1,55 @@
+@model MiniMarketApp.ViewModels.ResumenGeneralDto
+@{
+    ViewData["Title"] = "Resumen General";
+}
+
+<div class="container mt-4">
+    <h2>Resumen General del Sistema</h2><div id="reporte-pdf">
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Clientes</div>
+                <div class="card-body">
+                    <h5 class="card-title">Activos: @Model.ClientesActivos</h5>
+                    <p class="card-text">Inactivos: @Model.ClientesInactivos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Productos</div>
+                <div class="card-body">
+                    <h5 class="card-title">Activos: @Model.ProductosActivos</h5>
+                    <p class="card-text">Inactivos: @Model.ProductosInactivos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Ventas Totales</div>
+                <div class="card-body">
+                    <h5 class="card-title">Activas: @Model.VentasActivas</h5>
+                    <p class="card-text">Anuladas/Inactivas: @Model.VentasInactivas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-warning mb-3">
+                <div class="card-header bg-warning text-dark">Ventas del Último Mes</div>
+                <div class="card-body">
+                    <h5 class="card-title">Total de Transacciones: @Model.TotalVentasUltimoMes</h5>
+                    <p class="card-text">Ingresos Generados: @Model.TotalIngresosUltimoMes.ToString("C")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <a asp-action="Index" class="btn btn-secondary mt-3"><i class="bi bi-arrow-left"></i> Volver a Reportes</a>
+</div>
+
+
+</div>
+</div>
+

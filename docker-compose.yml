@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  postgres_db:
+    image: postgres:16-alpine
+    container_name: market_rubik_db
+    environment:
+      POSTGRES_DB: market_rubik_db
+      POSTGRES_USER: cruduser
+      POSTGRES_PASSWORD: ${MARKET_DB_PASSWORD:?Define MARKET_DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U cruduser -d market_rubik_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: market_rubik_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@marketrubik.com
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:?Define PGADMIN_PASSWORD}
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    restart: always
+
+  ai_service:
+    build:
+      context: ./ai_service
+      dockerfile: Dockerfile
+    container_name: market_rubik_ai
+    ports:
+      - "5000:5000"
+    restart: always
+
+  web_app:
+    build:
+      context: ./Market Rubik_SB
+      dockerfile: Dockerfile
+    container_name: market_rubik_web
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=market_rubik_db;Port=5432;Database=market_rubik_db;Username=cruduser;Password=${MARKET_DB_PASSWORD:?Define MARKET_DB_PASSWORD}
+      - AIService__Url=http://ai_service:5000
+      - ASPNETCORE_ENVIRONMENT=Production
+      - Bootstrap__AdminPassword=${MARKET_ADMIN_PASSWORD:-}
+      - Ollama__Url=http://host.docker.internal:11434
+      - Ollama__Model=qwen2.5:0.5b
+      # Google OAuth
+      - Authentication__Google__ClientId=${GOOGLE_CLIENT_ID:-}
+      - Authentication__Google__ClientSecret=${GOOGLE_CLIENT_SECRET:-}
+      # Email SMTP
+      - EmailSettings__SenderName=Supermarket Rubik
+      - EmailSettings__SenderEmail=${SMTP_EMAIL:-}
+      - EmailSettings__SmtpServer=smtp.gmail.com
+      - EmailSettings__SmtpPort=587
+      - EmailSettings__Password=${SMTP_PASSWORD:-}
+      # PayPal Sandbox
+      - PayPal__ClientId=${PAYPAL_CLIENT_ID:-}
+      - PayPal__ClientSecret=${PAYPAL_CLIENT_SECRET:-}
+      - PayPal__BaseUrl=https://api-m.sandbox.paypal.com
+      - PayPal__ReturnUrl=http://localhost:8080/Payment/Success
+      - PayPal__CancelUrl=http://localhost:8080/Payment/Cancel
+      # PayPhone
+      - PayPhone__Token=${PAYPHONE_TOKEN:-}
+      - PayPhone__StoreId=${PAYPHONE_STORE_ID:-}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+      ai_service:
+        condition: service_started
+    restart: always
+
+volumes:
+  postgres_data:

@@ -1,0 +1,78 @@
+@page
+@model ExternalLoginsModel
+@{
+    ViewData["Title"] = "Cuentas Externas (Google OAuth)";
+    ViewData["ActivePage"] = ManageNavPages.ExternalLogins;
+}
+
+<div class="row">
+    <div class="col-md-10 col-lg-8">
+        <div class="d-flex align-items-center gap-3 mb-3 text-primary">
+            <div class="bg-primary bg-opacity-10 p-3 rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                <i class="bi bi-google fs-4 text-danger"></i>
+            </div>
+            <div>
+                <h3 class="fw-bold mb-0 text-dark">Cuentas Externas de Autenticación</h3>
+                <p class="text-muted small mb-0">Gestiona tus inicios de sesión vinculados con Google OAuth 2.0.</p>
+            </div>
+        </div>
+        <hr class="my-4 text-muted opacity-25" />
+
+        <partial name="_StatusMessage" for="StatusMessage" />
+
+        @if (Model.CurrentLogins?.Count > 0)
+        {
+            <h5 class="fw-bold text-dark mb-3">Inicios de Sesión Vinculados</h5>
+            <div class="table-responsive mb-4">
+                <table class="table align-middle table-hover border rounded-3 overflow-hidden">
+                    <tbody class="table-group-divider">
+                        @foreach (var login in Model.CurrentLogins)
+                        {
+                            <tr>
+                                <td class="fw-semibold px-3">
+                                    <i class="bi bi-google text-danger me-2"></i> @login.ProviderDisplayName
+                                </td>
+                                <td class="text-end px-3">
+                                    @if (Model.ShowRemoveButton)
+                                    {
+                                        <form id="@($"remove-login-{login.LoginProvider}")" asp-page-handler="RemoveLogin" method="post">
+                                            <div>
+                                                <input asp-for="@login.LoginProvider" name="LoginProvider" type="hidden" />
+                                                <input asp-for="@login.ProviderKey" name="ProviderKey" type="hidden" />
+                                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3" title="Desvincular cuenta @login.ProviderDisplayName">
+                                                    <i class="bi bi-x-circle me-1"></i> Desvincular
+                                                </button>
+                                            </div>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Único método de acceso</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        @if (Model.OtherLogins?.Count > 0)
+        {
+            <h5 class="fw-bold text-dark mb-2">Vincular Nuevo Servicio de Autenticación</h5>
+            <p class="text-muted small mb-3">Haz clic en el botón a continuación para asociar tu cuenta de Google:</p>
+            <form id="link-login-form" asp-page-handler="LinkLogin" method="post" class="form-horizontal">
+                <div id="socialLoginList">
+                    <p>
+                        @foreach (var provider in Model.OtherLogins)
+                        {
+                            <button id="@($"link-login-button-{provider.Name}")" type="submit" class="btn btn-outline-danger rounded-pill px-4 py-2 fw-semibold shadow-sm" name="provider" value="@provider.Name" title="Iniciar sesión con tu cuenta de @provider.DisplayName">
+                                <i class="bi bi-google me-2"></i> Vincular cuenta de @provider.DisplayName
+                            </button>
+                        }
+                    </p>
+                </div>
+            </form>
+        }
+    </div>
+</div>

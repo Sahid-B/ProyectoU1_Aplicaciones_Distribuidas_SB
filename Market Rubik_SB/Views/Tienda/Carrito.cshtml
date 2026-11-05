@@ -1,0 +1,110 @@
+@model IEnumerable<MiniMarketApp.Models.CarritoItem>
+@{
+    ViewData["Title"] = "Mi Carrito";
+    decimal subtotal = Model.Sum(i => i.Subtotal);
+    decimal descuentoPromociones = ViewBag.DescuentoPromociones ?? 0m;
+    decimal baseImponible = Math.Max(0, subtotal - descuentoPromociones);
+    decimal iva = baseImponible * 0.15m;
+    decimal total = baseImponible + iva;
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <h2 class="text-primary fw-bold"><i class="bi bi-cart-check"></i> Mi Carrito de Compras</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill"><i class="bi bi-arrow-left"></i> Seguir Comprando</a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-cart-x text-muted" style="font-size: 5rem;"></i>
+            <h4 class="mt-3 text-muted">Tu carrito está vacío</h4>
+            <p class="text-muted mb-4">Aún no has agregado ningún producto. ¡Explora nuestro catálogo!</p>
+            <a asp-action="Index" class="btn btn-primary rounded-pill px-5">Ir a la Tienda</a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 rounded-4 mb-4">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-borderless align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-4">Producto</th>
+                                        <th class="text-center">Precio</th>
+                                        <th class="text-center">Cantidad</th>
+                                        <th class="text-end">Subtotal</th>
+                                        <th class="pe-4 text-center">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td class="ps-4">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-light rounded p-2 me-3 text-secondary">
+                                                        <i class="bi bi-box-seam fs-4"></i>
+                                                    </div>
+                                                    <span class="fw-bold text-dark">@item.Nombre</span>
+                                                </div>
+                                            </td>
+                                            <td class="text-center text-muted">@item.Precio.ToString("C")</td>
+                                            <td class="text-center fw-bold">@item.Cantidad</td>
+                                            <td class="text-end fw-bold text-dark">@item.Subtotal.ToString("C")</td>
+                                            <td class="pe-4 text-center">
+                                                <form asp-action="QuitarDelCarrito" method="post">
+                                                    <input type="hidden" name="productoId" value="@item.ProductoId" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" title="Quitar">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card shadow border-0 rounded-4 bg-light">
+                    <div class="card-body p-4">
+                        <h4 class="fw-bold mb-4 text-dark border-bottom pb-2">Resumen</h4>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted">Subtotal</span>
+                            <span class="fw-bold">@subtotal.ToString("C")</span>
+                        </div>
+                        @if (descuentoPromociones > 0)
+                        {
+                            <div class="d-flex justify-content-between mb-3 text-success">
+                                <span><i class="bi bi-tag-fill"></i> Descuentos</span>
+                                <span class="fw-bold">-@descuentoPromociones.ToString("C")</span>
+                            </div>
+                        }
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted">IVA (15%)</span>
+                            <span class="fw-bold">@iva.ToString("C")</span>
+                        </div>
+                        <hr />
+                        <div class="d-flex justify-content-between mb-4">
+                            <span class="fs-5 fw-bold text-dark">Total</span>
+                            <span class="fs-4 fw-bold text-success">@total.ToString("C")</span>
+                        </div>
+                        
+                        <form asp-action="Pagar" method="post">
+                            <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm" style="font-size: 1.1rem;">
+                                <i class="bi bi-credit-card me-2"></i> Pagar Ahora
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

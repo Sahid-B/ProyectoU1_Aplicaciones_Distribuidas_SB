@@ -1,0 +1,32 @@
+@{
+    if (ViewData.TryGetValue("ParentLayout", out var parentLayout) && parentLayout != null)
+    {
+        Layout = parentLayout.ToString();
+    }
+    else
+    {
+        Layout = "/Views/Shared/_Layout.cshtml";
+    }
+}
+
+<div class="container my-5">
+    <div class="p-4 p-md-5 mb-4 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+        <h1 class="display-6 fw-bold mb-1"><i class="bi bi-gear-wide-connected me-2"></i>Gestión de Cuenta</h1>
+        <p class="lead mb-0 opacity-75">Administra la seguridad, correo electrónico y autenticación multifactor (MFA/TOTP) en Supermarket Rubik.</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-3">
+            <partial name="_ManageNav" />
+        </div>
+        <div class="col-lg-9">
+            <div class="card shadow-sm border-0 rounded-4 p-4 p-md-5">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

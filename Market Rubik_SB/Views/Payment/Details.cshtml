@@ -1,0 +1,143 @@
+@model MiniMarketApp.Models.TransaccionPago
+@inject Microsoft.Extensions.Options.IOptions<MiniMarketApp.Settings.PayPalSettings> PayPalSettings
+
+@{
+    ViewData["Title"] = "Detalle de Pago";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header bg-primary text-white text-center py-3 rounded-top-4">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-receipt me-2"></i>Detalle de Transacción</h4>
+                </div>
+                <div class="card-body p-4">
+                    
+                    <div class="row mb-4">
+                        <div class="col-sm-6 mb-3 mb-sm-0">
+                            <h6 class="text-muted mb-1">ID de Venta</h6>
+                            <p class="fs-5 fw-semibold mb-0">#@Model.VentaId</p>
+                        </div>
+                        <div class="col-sm-6 text-sm-end">
+                            <h6 class="text-muted mb-1">Monto Total</h6>
+                            <p class="fs-4 fw-bold text-success mb-0">$@((Model.AmountInCents / 100.0m).ToString("0.00"))</p>
+                        </div>
+                    </div>
+
+                    <ul class="list-group list-group-flush mb-4">
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Estado del Pago</span>
+                            @if (Model.Status == "Paid" || Model.Status == "COMPLETED")
+                            {
+                                <span class="badge bg-success rounded-pill px-3 py-2 fs-6">Pagado</span>
+                            }
+                            else if (Model.Status == "Pending")
+                            {
+                                <span class="badge bg-warning text-dark rounded-pill px-3 py-2 fs-6">Pendiente</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger rounded-pill px-3 py-2 fs-6">@Model.Status</span>
+                            }
+                        </li>
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Método de Pago</span>
+                            <span class="fw-medium">@Model.Provider</span>
+                        </li>
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <span class="text-muted">ID de Transacción</span>
+                            <span class="fw-medium text-break">@Model.ClientTransactionId</span>
+                        </li>
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Fecha de Creación</span>
+                            <span class="fw-medium">@Model.CreatedAt.ToLocalTime().ToString("g")</span>
+                        </li>
+                        @if (Model.ConfirmedAt.HasValue)
+                        {
+                            <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                                <span class="text-muted">Fecha de Confirmación</span>
+                                <span class="fw-medium">@Model.ConfirmedAt.Value.ToLocalTime().ToString("g")</span>
+                            </li>
+                        }
+                    </ul>
+
+                    @if (Model.Status == "Pending")
+                    {
+                        <div class="text-center mt-4">
+                            @if (Model.Provider == "PayPhone" && !string.IsNullOrEmpty(Model.PayphonePaymentUrl))
+                            {
+                                <p class="text-muted mb-3">Para completar tu pago con tarjeta de crédito/débito o la app PayPhone, haz clic en el botón de abajo:</p>
+                                
+                                <!-- PayPhone Button Integration -->
+                                <div id="payphone-btn-container" class="mb-3">
+                                    <button id="payphone-trigger" class="btn btn-warning w-100 rounded-pill fw-bold py-3 fs-5 shadow-sm text-dark">
+                                        <i class="bi bi-phone me-2"></i> Pagar con PayPhone
+                                    </button>
+                                </div>
+                            }
+                            else if (Model.Provider == "PayPal" && !string.IsNullOrEmpty(Model.ClientTransactionId))
+                            {
+                                <p class="text-muted mb-3">Completa tu pago de forma segura usando PayPal:</p>
+                                <div id="paypal-button-container" class="w-100"></div>
+                            }
+                        </div>
+                    }
+
+                    <div class="text-center mt-4 pt-3 border-top">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                            <i class="bi bi-house me-2"></i> Volver al Inicio
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @if (Model.Provider == "PayPhone" && Model.Status == "Pending" && !string.IsNullOrEmpty(Model.PayphonePaymentUrl))
+    {
+        <!-- Script to open PayPhone in a modal/popup to keep the user on the site -->
+        <script>
+            document.getElementById('payphone-trigger').addEventListener('click', function(e) {
+                e.preventDefault();
+                // Open PayPhone URL in a centered popup window
+                var width = 600;
+                var height = 700;
+                var left = (window.innerWidth - width) / 2;
+                var top = (window.innerHeight - height) / 2;
+                var url = '@Model.PayphonePaymentUrl';
+                
+                window.open(url, 'PayPhonePayment', 'width=' + width + ',height=' + height + ',top=' + top + ',left=' + left + ',resizable=yes,scrollbars=yes');
+                
+                // Optionally, we could set a polling interval to check if payment is completed
+                // or just ask the user to refresh the page after they finish.
+                alert('Se ha abierto una ventana segura para procesar tu pago con PayPhone. Una vez finalizado, cierra la ventana y recarga esta página.');
+            });
+        </script>
+    }
+    
+    @if (Model.Provider == "PayPal" && Model.Status == "Pending" && !string.IsNullOrEmpty(Model.ClientTransactionId))
+    {
+        <!-- PayPal JS SDK -->
+        <script src="https://www.paypal.com/sdk/js?client-id=@PayPalSettings.Value.ClientId&currency=USD"></script>
+        <script>
+            paypal.Buttons({
+                createOrder: function(data, actions) {
+                    // Use the existing order ID created by the backend
+                    return '@Model.ClientTransactionId';
+                },
+                onApprove: function(data, actions) {
+                    // Redirect to the backend success endpoint with the token
+                    window.location.href = '@Url.Action("Success", "Payment")?token=' + data.orderID;
+                },
+                onCancel: function(data) {
+                    // Redirect to the backend cancel endpoint
+                    window.location.href = '@Url.Action("Cancel", "Payment")?token=' + data.orderID;
+                }
+            }).render('#paypal-button-container');
+        </script>
+    }
+}

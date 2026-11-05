@@ -1,0 +1,17 @@
+@page
+@model MiniMarketApp.Areas.Identity.Pages.Account.ExternalLoginModel
+@{
+    ViewData["Title"] = "Registro Externo";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="card shadow border-0 rounded-4 p-4">
+                <h2 class="text-danger fw-bold"><i class="bi bi-exclamation-triangle-fill"></i> Error de Autenticación</h2>
+                <p class="text-muted mt-3">@Model.ErrorMessage</p>
+                <a asp-page="./Login" class="btn btn-primary rounded-pill mt-3 px-4">Volver al Inicio de Sesión</a>
+            </div>
+        </div>
+    </div>
+</div>

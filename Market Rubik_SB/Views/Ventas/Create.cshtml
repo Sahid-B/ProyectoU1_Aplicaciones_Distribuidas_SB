@@ -1,0 +1,69 @@
+﻿@model MiniMarketApp.Models.Venta
+
+@{
+    ViewData["Title"] = "Nuevo Registro";
+}
+
+<h2 class="mb-4 text-primary fw-bold">Nuevo Registro</h2>
+<div class="row justify-content-center"><div class="col-md-8"><div class="card shadow-sm border-0 rounded-4"><div class="card-body p-4 p-md-5 bg-white">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group mb-3">
+                <label asp-for="NumeroVenta" class="control-label fw-bold text-muted mb-1"></label>
+                <input asp-for="NumeroVenta" class="form-control form-control-lg bg-light" />
+                <span asp-validation-for="NumeroVenta" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="ClienteId" class="control-label fw-bold text-muted mb-1"></label>
+                <select asp-for="ClienteId" class ="form-control" asp-items="ViewBag.ClienteId"></select>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="FechaVenta" class="control-label fw-bold text-muted mb-1"></label>
+                <input asp-for="FechaVenta" class="form-control form-control-lg bg-light" />
+                <span asp-validation-for="FechaVenta" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Subtotal" class="control-label fw-bold text-muted mb-1"></label>
+                <input asp-for="Subtotal" class="form-control form-control-lg bg-light" />
+                <span asp-validation-for="Subtotal" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Iva" class="control-label fw-bold text-muted mb-1"></label>
+                <input asp-for="Iva" class="form-control form-control-lg bg-light" />
+                <span asp-validation-for="Iva" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Total" class="control-label fw-bold text-muted mb-1"></label>
+                <input asp-for="Total" class="form-control form-control-lg bg-light" />
+                <span asp-validation-for="Total" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Estado" class="control-label fw-bold text-muted mb-1"></label>
+                <input asp-for="Estado" class="form-control form-control-lg bg-light" />
+                <span asp-validation-for="Estado" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Activo" /> @Html.DisplayNameFor(model => model.Activo)
+                </label>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="FechaCreacion" class="control-label fw-bold text-muted mb-1"></label>
+                <input asp-for="FechaCreacion" class="form-control form-control-lg bg-light" />
+                <span asp-validation-for="FechaCreacion" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="FechaActualizacion" class="control-label fw-bold text-muted mb-1"></label>
+                <input asp-for="FechaActualizacion" class="form-control form-control-lg bg-light" />
+                <span asp-validation-for="FechaActualizacion" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm"><i class="bi bi-save"></i> Guardar</button>
+            </div>
+        </form></div></div></div></div><div class="mt-4"><a asp-action="Index" class="btn btn-secondary mt-3"><i class="bi bi-arrow-left"></i> Volver a la lista</a>
+</div>
+
+
+
+
+

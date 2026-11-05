@@ -1,0 +1,128 @@
+@model IEnumerable<MiniMarketApp.Services.PredictionResultDto>
+
+@{
+    ViewData["Title"] = "Inteligencia Artificial - Predictor de Demanda";
+    bool isAiOnline = ViewBag.IsAiOnline ?? false;
+}
+
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 text-primary fw-bold mb-1">
+                <i class="bi bi-cpu-fill me-2"></i>Módulo de Inteligencia Artificial (Contenedorizado)
+            </h1>
+            <p class="text-muted">Modelos predictivos de demanda de stock y recomendador de reabastecimiento en tiempo real.</p>
+        </div>
+        <div>
+            @if (isAiOnline)
+            {
+                <span class="badge bg-success fs-6"><i class="bi bi-check-circle-fill me-1"></i> Servicio IA en Línea</span>
+            }
+            else
+            {
+                <span class="badge bg-warning text-dark fs-6"><i class="bi bi-exclamation-triangle-fill me-1"></i> Modo Standalone / Simulación Integrada</span>
+            }
+        </div>
+    </div>
+
+    <!-- Asistente de Consulta con IA -->
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-header bg-gradient bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-chat-dots me-2"></i> Asistente de Inventario con IA</h5>
+        </div>
+        <div class="card-body">
+            <div class="input-group mb-3">
+                <input type="text" id="aiQueryPrompt" class="form-control form-control-lg" placeholder="Consulte al modelo de IA (ej: ¿Cuáles productos requieren reabastecimiento urgente esta semana?)" />
+                <button class="btn btn-primary btn-lg px-4" type="button" id="btnConsultarIa" onclick="consultarIA()">
+                    <i class="bi bi-send-fill me-1"></i> Consultar IA
+                </button>
+            </div>
+            <div id="aiResponseContainer" class="p-3 bg-light rounded border d-none">
+                <strong class="text-primary"><i class="bi bi-robot me-1"></i> Respuesta del Modelo IA:</strong>
+                <p id="aiResponseText" class="mt-2 mb-0 lead fs-6"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Predicciones y Análisis de Stock Crítico -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-graph-up-arrow me-2"></i> Predicción de Demanda de Productos Críticos</h5>
+            <small class="text-light">Confianza del modelo: ~95%</small>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Producto</th>
+                            <th>Stock Actual</th>
+                            <th>Demanda Estimada (30d)</th>
+                            <th>Nivel de Riesgo</th>
+                            <th>Recomendación de Reabastecimiento</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="fw-bold">@item.ProductoNombre</td>
+                                <td><span class="badge bg-secondary">@item.StockActual unidades</span></td>
+                                <td><span class="badge bg-info text-dark">@item.DemandaEstimadaMes unidades</span></td>
+                                <td>
+                                    @if (item.NivelRiesgo == "Alto")
+                                    {
+                                        <span class="badge bg-danger">Alto Riesgo</span>
+                                    }
+                                    else if (item.NivelRiesgo == "Medio")
+                                    {
+                                        <span class="badge bg-warning text-dark">Medio Riesgo</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">Stock Óptimo</span>
+                                    }
+                                </td>
+                                <td>@item.RecomendacionReabastecimiento</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        async function consultarIA() {
+            const promptInput = document.getElementById("aiQueryPrompt");
+            const responseContainer = document.getElementById("aiResponseContainer");
+            const responseText = document.getElementById("aiResponseText");
+            const btn = document.getElementById("btnConsultarIa");
+
+            if (!promptInput.value.trim()) return;
+
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status"></span> Procesando...`;
+
+            try {
+                const res = await fetch("/AI/Consultar", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ prompt: promptInput.value })
+                });
+
+                const data = await res.json();
+                responseText.innerText = data.response || "No se obtuvo respuesta del servicio de IA.";
+                responseContainer.classList.remove("d-none");
+            } catch (err) {
+                responseText.innerText = "Error de comunicación con el modelo contenedorizado de IA.";
+                responseContainer.classList.remove("d-none");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="bi bi-send-fill me-1"></i> Consultar IA`;
+            }
+        }
+    </script>
+}

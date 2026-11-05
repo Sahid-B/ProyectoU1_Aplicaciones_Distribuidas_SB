@@ -1,0 +1,76 @@
+@page
+@using Microsoft.AspNetCore.Http.Features
+@model Microsoft.AspNetCore.Identity.UI.V5.Pages.Account.Manage.Internal.TwoFactorAuthenticationModel
+
+@{
+    ViewData["Title"] = "Autenticación de Dos Factores (2FA / TOTP)";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<h3 class="fw-bold text-primary mb-3"><i class="bi bi-phone-vibrate me-2"></i>@ViewData["Title"]</h3>
+<partial name="_StatusMessage" for="StatusMessage" />
+
+<p class="text-muted">La autenticación de dos factores (2FA / TOTP) añade una capa adicional de seguridad a tu cuenta en <strong>Supermarket Rubik</strong>.</p>
+
+@if (Model.Is2faEnabled)
+{
+    if (Model.RecoveryCodesLeft == 0)
+    {
+        <div class="alert alert-danger rounded-3">
+            <strong>No te quedan códigos de recuperación.</strong> Debes <a asp-page="./GenerateRecoveryCodes">generar un nuevo conjunto de códigos de recuperación</a> antes de poder iniciar sesión con un código de recuperación.
+        </div>
+    }
+    else if (Model.RecoveryCodesLeft == 1)
+    {
+        <div class="alert alert-danger rounded-3">
+            <strong>Te queda 1 código de recuperación.</strong> Puedes <a asp-page="./GenerateRecoveryCodes">generar un nuevo conjunto de códigos de recuperación</a>.
+        </div>
+    }
+    else if (Model.RecoveryCodesLeft <= 3)
+    {
+        <div class="alert alert-warning rounded-3">
+            <strong>Te quedan @Model.RecoveryCodesLeft códigos de recuperación.</strong> Deberías <a asp-page="./GenerateRecoveryCodes">generar un nuevo conjunto de códigos de recuperación</a>.
+        </div>
+    }
+
+    if (Model.IsMachineRemembered)
+    {
+        <form method="post" style="display: inline-block">
+            <button type="submit" class="btn btn-secondary rounded-3 me-2 mb-2">Olvidar este navegador</button>
+        </form>
+    }
+
+    <a asp-page="./Disable2fa" class="btn btn-outline-danger rounded-3 me-2 mb-2">Deshabilitar 2FA</a>
+    <a asp-page="./GenerateRecoveryCodes" class="btn btn-outline-secondary rounded-3 mb-2">Restablecer códigos de recuperación</a>
+}
+
+<div class="card border-0 bg-light rounded-4 p-4 mt-3">
+    <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-qr-code me-2"></i>Aplicación Autenticadora</h5>
+    @if (!Model.HasAuthenticator)
+    {
+        <div class="mb-3">
+            <span class="badge bg-warning text-dark me-2">Inactivo</span> No has configurado una app autenticadora aún.
+        </div>
+        <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-primary btn-lg rounded-3 fw-bold px-4 shadow-sm" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border: none;">
+            <i class="bi bi-plus-circle-fill me-2"></i> Agregar Aplicación Autenticadora (Código QR)
+        </a>
+    }
+    else
+    {
+        <div class="mb-3">
+            <span class="badge bg-success me-2">Activo</span> Tu aplicación autenticadora está vinculada correctamente.
+        </div>
+        <div>
+            <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-outline-primary rounded-3 fw-semibold me-2 mb-2">
+                <i class="bi bi-gear-fill me-1"></i> Configurar app autenticadora
+            </a>
+            <a id="reset-authenticator" asp-page="./ResetAuthenticator" class="btn btn-outline-danger rounded-3 fw-semibold mb-2">
+                <i class="bi bi-arrow-counterclockwise me-1"></i> Restablecer clave autenticadora
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

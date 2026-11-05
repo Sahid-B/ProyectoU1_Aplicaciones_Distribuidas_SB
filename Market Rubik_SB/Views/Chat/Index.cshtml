@@ -1,0 +1,104 @@
+@{ 
+    ViewData["Title"] = "Chats"; 
+}
+<link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" />
+
+<div class="container my-4">
+    <div id="chat-fullscreen-wrapper">
+        <div id="chat-widget" class="chat-embedded" data-me="@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value">
+            
+            <!-- Barra Lateral Izquierda: Contactos Estilo WhatsApp / Messenger -->
+            <aside class="chat-sidebar">
+                <div class="chat-sidebar-header">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h4 class="mb-0 fw-bold text-dark">Chats</h4>
+                        <span id="online-count" class="badge-online">0 en línea</span>
+                    </div>
+                    <div class="search-box-wrap">
+                        <input id="contact-search" type="search" placeholder="Buscar o iniciar nuevo chat..." autocomplete="off" />
+                    </div>
+                </div>
+
+                <div id="threads-panel" class="chat-contact-list">
+                    <div id="threads"></div>
+                </div>
+            </aside>
+
+            <!-- Área Central / Derecha: Conversación Activa -->
+            <main class="chat-main-area">
+                <!-- Header de conversación -->
+                <header class="chat-main-header">
+                    <div id="chat-header-peer" class="d-flex align-items-center gap-3">
+                        <div id="chat-peer-avatar-hdr" class="avatar-circle">?</div>
+                        <div class="peer-details">
+                            <h5 id="chat-peer-name-hdr" class="mb-0 fw-bold">Elige un contacto</h5>
+                            <small id="chat-peer-status-hdr" class="text-muted">Selecciona una conversación a la izquierda</small>
+                        </div>
+                    </div>
+
+                    <div id="call-bar" class="call-actions-bar">
+                        <button id="dial" type="button" class="btn-action-icon btn-call" title="Iniciar Videollamada" hidden>
+                            <i class="bi bi-camera-video-fill"></i>
+                        </button>
+                        <button id="accept" type="button" class="btn-action-icon btn-accept" title="Aceptar videollamada" hidden>
+                            <i class="bi bi-telephone-inbound-fill"></i> Aceptar
+                        </button>
+                        <button id="hang" type="button" class="btn-action-icon btn-hang" title="Colgar videollamada" hidden>
+                            <i class="bi bi-telephone-x-fill"></i> Colgar
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Estado del chat (notificaciones / alertas) -->
+                <p id="chat-status" role="status" class="mb-0"></p>
+
+                <!-- Pantalla de bienvenida cuando no hay contacto seleccionado -->
+                <div id="no-peer-msg" class="empty-chat-state">
+                    <div class="empty-icon-wrap">
+                        <i class="bi bi-chat-dots-fill"></i>
+                    </div>
+                    <h4>Supermarket Rubik Messenger</h4>
+                    <p class="text-muted">Envía mensajes instantáneos, consulta productos y conéctate con clientes y personal en tiempo real.</p>
+                </div>
+
+                <!-- Contenedor de la conversación activa -->
+                <div id="conv-panel">
+                    <!-- Mensajes -->
+                    <ul id="messages" aria-live="polite"></ul>
+
+                    <!-- Mini reproductor de videollamada -->
+                    <div id="video-area">
+                        <video id="local-video" autoplay muted playsinline></video>
+                        <video id="remote-video" autoplay playsinline></video>
+                    </div>
+
+                    <!-- Adjuntar producto desplegable -->
+                    <div id="product-attach-bar">
+                        <input id="search-product" placeholder="🔍 Buscar producto en el catálogo..." type="search" />
+                        <select id="product" aria-label="Producto adjunto">
+                            <option value="">Sin producto adjunto</option>
+                        </select>
+                    </div>
+
+                    <!-- Input barra inferior estilo WhatsApp -->
+                    <small id="typing" role="status"></small>
+                    <div id="compose-mode" hidden><span></span> <button type="button">Cancelar</button></div>
+                    <form id="message-form" class="hidden-form">
+                        <button type="button" id="product-attach-toggle" title="Adjuntar producto de la tienda" class="btn-clip">
+                            <i class="bi bi-paperclip"></i>
+                        </button>
+                        <textarea id="body" placeholder="Escribe un mensaje aquí..." maxlength="2000" rows="1"></textarea>
+                        <button type="submit" id="send-btn" title="Enviar mensaje">
+                            <i class="bi bi-send-fill"></i>
+                        </button>
+                    </form>
+                </div>
+            </main>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/market-chat.js" asp-append-version="true"></script>
+}

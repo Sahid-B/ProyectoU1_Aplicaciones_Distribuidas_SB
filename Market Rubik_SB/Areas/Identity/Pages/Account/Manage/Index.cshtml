@@ -1,0 +1,46 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Perfil de Usuario";
+    ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<div class="row">
+    <div class="col-md-10 col-lg-8">
+        <div class="d-flex align-items-center gap-3 mb-3 text-primary">
+            <div class="bg-primary bg-opacity-10 p-3 rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                <i class="bi bi-person-badge fs-4"></i>
+            </div>
+            <div>
+                <h3 class="fw-bold mb-0 text-dark">Perfil de Usuario</h3>
+                <p class="text-muted small mb-0">Información básica y contacto de tu cuenta en Supermarket Rubik.</p>
+            </div>
+        </div>
+        <hr class="my-4 text-muted opacity-25" />
+
+        <partial name="_StatusMessage" for="StatusMessage" />
+
+        <form id="profile-form" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Username" class="form-control bg-light" placeholder="Nombre de Usuario" disabled />
+                <label asp-for="Username" class="form-label">Nombre de Usuario / Correo</label>
+            </div>
+
+            <div class="form-floating mb-4">
+                <input asp-for="Input.PhoneNumber" class="form-control border-primary border-opacity-25" placeholder="Ingresa tu número de teléfono" />
+                <label asp-for="Input.PhoneNumber" class="form-label">Número de Teléfono</label>
+                <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+            </div>
+
+            <button id="update-profile-button" type="submit" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm">
+                <i class="bi bi-floppy-fill me-1"></i> Guardar Cambios
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
